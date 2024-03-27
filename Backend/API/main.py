@@ -32,7 +32,8 @@ def index() -> dict[str, dict[int, Item]]:
 
     return {"items": items}
 
-
+# Path parameters can be specified with {} directly in the path (similar to f-string syntax)
+# These parameters will be forwarded to the decorated function as keyword arguments.
 @app.get("/items/{item_id}")
 def query_item_by_id(item_id: int) -> Item:
 
@@ -40,6 +41,15 @@ def query_item_by_id(item_id: int) -> Item:
         HTTPException(status_code=404, detail=f"Item with {item_id=} does not exist.")
 
     return items[item_id]
+
+@app.post("/")
+def add_item(item: Item) -> dict[str, Item]:
+
+    if item.id in items:
+        HTTPException(status_code=400, detail=f"Item with {item.id=} already exists.")
+
+    items[item.id] = item
+    return {"added": item}
 
 
 @app.put("/items/{item_id}")
